@@ -25,7 +25,7 @@ BejeweledGame.prototype.init = function() {
     this.jewels.push(p5Object.loadImage("image/"+ i +".png"));
   }
 
-  /*
+
   for (var i = 0; i < BOARD_HEIGHT; i++) {
     var row = [];
     for (var j = 0; j < BOARD_WIDTH; j++) {
@@ -34,8 +34,10 @@ BejeweledGame.prototype.init = function() {
     }
     this.gameBoard.push(row);
   }
-  */
 
+
+/*
+board for test
   this.gameBoard = [
     [1,2,1,2,1,2,1,2],
     [3,4,3,4,3,4,3,4],
@@ -46,6 +48,7 @@ BejeweledGame.prototype.init = function() {
     [1,2,1,2,1,2,1,2],
     [3,4,3,4,3,4,3,4]
   ];
+*/
   this.check_board();
 }
 
@@ -138,29 +141,52 @@ BejeweledGame.prototype.checkGameover = function(){
   // 만약 아니라면 나의 다음 다음번째가 같은 종류의 보석인지, 그렇다면 나의 왼쪽위 왼쪽 아래가 같은 종류의 보석인지 체크하기.
 
   // 체크시 범위가 넘어가지 않도록 잘 조절해야 한다.
+
   var leftDxDy = [[-1,-1],[-1,1]];
 
   var rightDxDy = [[2,-1],[2,1]];
 
   for(var y = 0; y < BOARD_HEIGHT; y++){
     for(var x = 0; x < BOARD_WIDTH - 1; x++){
-      var jewel = this.gameboard[y][x];
+      var jewel = this.gameBoard[y][x];
 
-      if( jewel === this.gameboard[y][x+1]){
+      if( jewel === this.gameBoard[y][x+1]){
         for(var i=0; i<2; i++){
           if(y + leftDxDy[i][1] < 0 || y + leftDxDy[i][1] >= BOARD_HEIGHT || x + leftDxDy[i][0] < 0 || x + leftDxDy[i][0] >= BOARD_WIDTH) continue;
-          if(this.gameboard[y + leftDxDy[i][1]][x + leftDxDy[i][0]] === jewel ) return false;
+          if(this.gameBoard[y + leftDxDy[i][1]][x + leftDxDy[i][0]] === jewel ) return false;
           if(y + rightDxDy[i][1] < 0 || y + rightDxDy[i][1] >= BOARD_HEIGHT || x + rightDxDy[i][0] < 0 || x + rightDxDy[i][0] >= BOARD_WIDTH) continue;
-          if(this.gameboard[y + rightDxDy[i][1]][x + rightDxDy[i][0]] === jewel ) return false;
+          if(this.gameBoard[y + rightDxDy[i][1]][x + rightDxDy[i][0]] === jewel ) return false;
         }
-      }else if(jewel === this.gameboard[y][x+2]){
+      }else if(jewel === this.gameBoard[y][x+2]){
         for(var i=0; i<2; i++){
           if(y + rightDxDy[i][1] < 0 || y + rightDxDy[i][1] >= BOARD_HEIGHT || x + rightDxDy[i][0] < 0 || x + rightDxDy[i][0] >= BOARD_WIDTH) continue;
-          if(this.gameboard[y + rightDxDy[i][1]][x + rightDxDy[i][0]] === jewel ) return false;
+          if(this.gameBoard[y + rightDxDy[i][1]][x + rightDxDy[i][0]] === jewel ) return false;
         }
       }
+    }
+  }
 
+  var topDxDy = [[-1,-1],[1,-1]];
+  var bottomDxDy = [[-1,2],[1,2]];
 
+  // 이번엔 세로
+  for(var x = 0; x < BOARD_WIDTH; x++){
+    for(var y = 0; y < BOARD_HEIGHT - 1; y++){
+      var jewel = this.gameBoard[y][x];
+
+      if( jewel === this.gameBoard[y+1][x]){
+        for(var i=0; i<2; i++){
+          if(y + topDxDy[i][1] < 0 || y + topDxDy[i][1] >= BOARD_HEIGHT || x + topDxDy[i][0] < 0 || x + topDxDy[i][0] >= BOARD_WIDTH) continue;
+          if(this.gameBoard[y + topDxDy[i][1]][x + topDxDy[i][0]] === jewel ) return false;
+          if(y + bottomDxDy[i][1] < 0 || y + bottomDxDy[i][1] >= BOARD_HEIGHT || x + bottomDxDy[i][0] < 0 || x + bottomDxDy[i][0] >= BOARD_WIDTH) continue;
+          if(this.gameBoard[y + bottomDxDy[i][1]][x + bottomDxDy[i][0]] === jewel ) return false;
+        }
+      }else if(jewel === this.gameBoard[y+1][x]){
+        for(var i=0; i<2; i++){
+          if(y + bottomDxDy[i][1] < 0 || y + bottomDxDy[i][1] >= BOARD_HEIGHT || x + bottomDxDy[i][0] < 0 || x + bottomDxDy[i][0] >= BOARD_WIDTH) continue;
+          if(this.gameBoard[y + bottomDxDy[i][1]][x + bottomDxDy[i][0]] === jewel ) return false;
+        }
+      }
     }
   }
 
@@ -291,6 +317,7 @@ var p5sketch = function(p) {
     }
     p.mouseClicked = function(){
       // p5의 좌표 받아오기 방식 사용
+      if(game.isGameover) return; //gameover되면 클릭 안되도록 한다.
       var x = p.mouseX;
       var y = p.mouseY;
 
