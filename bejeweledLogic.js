@@ -15,6 +15,8 @@ function BejeweledGame() {
   self.swap_counter = 0;
   // 같은 보석 종류를 찾아서 -1로 만들었을 경우 그걸 없애는 시간이 clean up 하는 의미라서 이런 변수명으로 만들어 둔 것 같다.
   self.clean_swap = false;
+  self.isGameover = false;
+  self.score = 0;
 }
 
 BejeweledGame.prototype.init = function() {
@@ -31,11 +33,7 @@ BejeweledGame.prototype.init = function() {
     }
     this.gameBoard.push(row);
   }
-  //클릭 이벤트 부분은 P5으로 처리
-  //self.canvas.click(self.click);
-
   this.check_board();
-
 }
 
 BejeweledGame.prototype.check_board = function() {
@@ -86,7 +84,10 @@ BejeweledGame.prototype.check_board = function() {
     }
   }
 
-  if (result.length) this.clean_board();
+  if (result.length){
+    this.clean_board();
+    this.score += scores.length;
+  }
 
   return result.length;
 }
@@ -196,12 +197,40 @@ function draw_bejeweledGame() {
       p5Object.image(jewel, draw_x, draw_y);
     }
   }
+
+  draw_score(game.score,0,0);
+  draw_state(false,0,0);
+}
+
+function draw_score(score,Sx,Sy){
+  var str = "SCORE";
+  p5Object.push();
+  p5Object.translate(0+Sx,276+Sy);
+  p5Object.rect(0, 0, 120, 50);
+  p5Object.text(str, 10, 20);
+  p5Object.text(score||0, 10, 45);
+  p5Object.pop();
+}
+
+function draw_state(isGameover,Sx,Sy){
+  p5Object.push();
+  p5Object.translate(130+Sx,276+Sy);
+  p5Object.rect(0, 0, 120, 50);
+
+  if(isGameover){
+    p5Object.text("GAME OVER", 10, 35);
+    p5Object.pop();
+    return;
+  }
+
+  p5Object.pop();
 }
 
 var p5sketch = function(p) {
     p5Object = p;
     p.setup = function() {
-        p.createCanvas(256,256);
+        p.createCanvas(256,500);
+        p.textSize(20);
         game = new BejeweledGame();
         game.run();
       }
@@ -214,7 +243,6 @@ var p5sketch = function(p) {
       var x = p.mouseX;
       var y = p.mouseY;
 
-      // 왜 32로 나누지?
       var gameBoard_x = Math.floor(x / 32);
       var gameBoard_y = Math.floor(y / 32);
 
